@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login — CPDS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5 col-lg-4">
+    <div class="card border-0 shadow-lg rounded-4 p-4 my-5">
+      <div class="text-center mb-4">
+        <div class="auth-icon bg-danger text-white rounded-circle mx-auto mb-3">
+          <i class="bi bi-shield-lock fs-2"></i>
+        </div>
+        <h3 class="fw-bold">Admin Login</h3>
+        <p class="text-muted small">Placement Office Administration</p>
+      </div>
+      <form method="POST">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Username</label>
+          <input type="text" name="username" class="form-control" placeholder="admin" required>
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="Admin password" required>
+        </div>
+        <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold">
+          <i class="bi bi-shield-check me-2"></i>Login as Admin
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

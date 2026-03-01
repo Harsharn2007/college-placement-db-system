@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}My Job Postings — CPDS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-briefcase me-2 text-success"></i>My Job Postings</h4>
+  <a href="{{ url_for('company_post_job') }}" class="btn btn-success">
+    <i class="bi bi-plus me-2"></i>Post New Job
+  </a>
+</div>
+
+{% if jobs %}
+<div class="row g-4">
+  {% for job in jobs %}
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="fw-bold mb-1">{{ job.role }}</h5>
+          <span class="badge bg-success fs-6">₹{{ job.package }} LPA</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="badge bg-primary bg-opacity-10 text-primary border">Min CGPA: {{ job.min_cgpa }}</span>
+          <span class="badge bg-secondary bg-opacity-10 text-secondary border">{{ job.eligible_branch }}</span>
+          {% if job.location %}<span class="badge bg-info bg-opacity-10 text-info border"><i class="bi bi-geo-alt me-1"></i>{{ job.location }}</span>{% endif %}
+        </div>
+        {% if job.skills %}<p class="small text-muted mb-1"><strong>Skills:</strong> {{ job.skills }}</p>{% endif %}
+        <p class="small text-muted mb-3">
+          <i class="bi bi-calendar me-1"></i>Deadline: {{ job.deadline }}
+          &nbsp;|&nbsp; <i class="bi bi-people me-1"></i>Applicants: <strong>{{ job.applicant_count }}</strong>
+        </p>
+        <div class="d-flex gap-2">
+          <a href="{{ url_for('company_applicants', job_id=job.id) }}" class="btn btn-outline-primary btn-sm flex-grow-1">
+            <i class="bi bi-people me-1"></i>View Applicants ({{ job.applicant_count }})
+          </a>
+          <form method="POST" action="{{ url_for('company_delete_job', job_id=job.id) }}" onsubmit="return confirm('Delete this job posting?')">
+            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-briefcase display-1 text-muted opacity-50 d-block mb-3"></i>
+  <h5 class="text-muted">No job postings yet</h5>
+  <a href="{{ url_for('company_post_job') }}" class="btn btn-success mt-2">Post Your First Job</a>
+</div>
+{% endif %}
+{% endblock %}

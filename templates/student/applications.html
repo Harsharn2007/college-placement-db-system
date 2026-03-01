@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}My Applications — CPDS{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4"><i class="bi bi-file-earmark-text me-2 text-primary"></i>My Applications</h4>
+
+{% if apps %}
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>#</th>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Package</th>
+            <th>Deadline</th>
+            <th>Applied On</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in apps %}
+          <tr>
+            <td class="text-muted small">{{ loop.index }}</td>
+            <td>
+              <strong>{{ app.company_name }}</strong><br>
+              <small class="text-muted">{{ app.industry }}</small>
+            </td>
+            <td>{{ app.role }}</td>
+            <td class="fw-semibold text-success">₹{{ app.package }} LPA</td>
+            <td><small>{{ app.deadline }}</small></td>
+            <td><small class="text-muted">{{ app.applied_at.strftime('%d %b %Y') }}</small></td>
+            <td>
+              {% set sc = {'Selected':'success','Shortlisted':'warning','Rejected':'danger','Applied':'secondary'} %}
+              <span class="badge bg-{{ sc[app.status] }} {% if app.status=='Shortlisted' %}text-dark{% endif %} px-3 py-2">
+                {% if app.status == 'Selected' %}<i class="bi bi-trophy-fill me-1"></i>
+                {% elif app.status == 'Shortlisted' %}<i class="bi bi-clock me-1"></i>
+                {% elif app.status == 'Rejected' %}<i class="bi bi-x-circle me-1"></i>
+                {% else %}<i class="bi bi-send me-1"></i>{% endif %}
+                {{ app.status }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-clipboard-x display-1 text-muted opacity-50 d-block mb-3"></i>
+  <h5 class="text-muted">No applications yet</h5>
+  <a href="{{ url_for('student_jobs') }}" class="btn btn-primary mt-2">
+    <i class="bi bi-briefcase me-2"></i>Browse Jobs
+  </a>
+</div>
+{% endif %}
+{% endblock %}

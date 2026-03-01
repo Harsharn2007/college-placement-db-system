@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}All Companies — Admin — CPDS{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4"><i class="bi bi-building me-2 text-danger"></i>Registered Companies ({{ companies|length }})</h4>
+<div class="row g-4">
+  {% for c in companies %}
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h5 class="fw-bold mb-1">{{ c.name }}</h5>
+            <small class="text-muted">{{ c.industry }}</small>
+          </div>
+          <form method="POST" action="{{ url_for('admin_delete_company', cid=c.id) }}" onsubmit="return confirm('Delete {{ c.name }}?')">
+            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+        <p class="small mb-2"><i class="bi bi-envelope me-1"></i>{{ c.email }}</p>
+        {% if c.website %}<p class="small mb-2"><i class="bi bi-globe me-1"></i><a href="{{ c.website }}" target="_blank">{{ c.website }}</a></p>{% endif %}
+        <div class="d-flex gap-3 mt-3">
+          <span class="badge bg-primary fs-6">{{ c.total_jobs }} Jobs</span>
+          <span class="badge bg-success fs-6">{{ c.total_hired }} Hired</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

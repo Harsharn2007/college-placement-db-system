@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Post a Job — CPDS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-success text-white rounded-top-4 p-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>Post a New Job Opening</h5>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Job Role / Position <span class="text-danger">*</span></label>
+              <input type="text" name="role" class="form-control" placeholder="Software Engineer" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Package (LPA) <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" name="package" class="form-control" step="0.5" min="1" placeholder="12.50" required>
+                <span class="input-group-text">LPA</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Minimum CGPA Required <span class="text-danger">*</span></label>
+              <input type="number" name="min_cgpa" class="form-control" step="0.01" min="0" max="10" placeholder="7.50" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Eligible Branch <span class="text-danger">*</span></label>
+              <select name="eligible_branch" class="form-select" required>
+                <option value="All">All Branches</option>
+                <option value="CSE">CSE</option>
+                <option value="IT">IT</option>
+                <option value="ECE">ECE</option>
+                <option value="EEE">EEE</option>
+                <option value="ME">ME</option>
+                <option value="CE">CE</option>
+                <option value="CH">CH</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Location</label>
+              <input type="text" name="location" class="form-control" placeholder="Bangalore / Remote">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Application Deadline <span class="text-danger">*</span></label>
+              <input type="date" name="deadline" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Required Skills</label>
+              <input type="text" name="skills" class="form-control" placeholder="Python, Django, SQL, REST APIs">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Job Description</label>
+              <textarea name="description" class="form-control" rows="4" placeholder="Describe the role, responsibilities, perks…"></textarea>
+            </div>
+            <div class="col-12 mt-2">
+              <button type="submit" class="btn btn-success px-4 fw-semibold">
+                <i class="bi bi-cloud-upload me-2"></i>Publish Job
+              </button>
+              <a href="{{ url_for('company_jobs') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

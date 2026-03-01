@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Student Registration — CPDS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7 col-md-9">
+    <div class="card border-0 shadow-lg rounded-4 p-4 my-4">
+      <div class="text-center mb-4">
+        <div class="auth-icon bg-primary text-white rounded-circle mx-auto mb-3">
+          <i class="bi bi-person-badge fs-2"></i>
+        </div>
+        <h3 class="fw-bold">Student Registration</h3>
+        <p class="text-muted">Create your placement profile</p>
+      </div>
+      <form method="POST" novalidate>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+            <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+            <input type="password" name="password" class="form-control" placeholder="Min 6 characters" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Phone Number</label>
+            <input type="tel" name="phone" class="form-control" placeholder="10-digit mobile">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Branch <span class="text-danger">*</span></label>
+            <select name="branch" class="form-select" required>
+              <option value="">-- Select Branch --</option>
+              <option value="CSE">Computer Science Engineering</option>
+              <option value="IT">Information Technology</option>
+              <option value="ECE">Electronics & Communication</option>
+              <option value="EEE">Electrical Engineering</option>
+              <option value="ME">Mechanical Engineering</option>
+              <option value="CE">Civil Engineering</option>
+              <option value="CH">Chemical Engineering</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">CGPA (out of 10) <span class="text-danger">*</span></label>
+            <input type="number" name="cgpa" class="form-control" step="0.01" min="0" max="10" placeholder="e.g. 8.25" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Skills <span class="text-danger">*</span></label>
+            <input type="text" name="skills" class="form-control" placeholder="Python, Java, React, SQL (comma-separated)" required>
+          </div>
+          <div class="col-12 mt-2">
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+              <i class="bi bi-person-check me-2"></i>Create Account
+            </button>
+          </div>
+        </div>
+      </form>
+      <hr class="my-3">
+      <p class="text-center text-muted mb-0">Already registered? <a href="{{ url_for('student_login') }}" class="fw-semibold text-primary">Login here</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

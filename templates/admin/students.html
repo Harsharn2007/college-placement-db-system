@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}All Students — Admin — CPDS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-people me-2 text-danger"></i>All Students ({{ students|length }})</h4>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-danger">
+          <tr><th>#</th><th>Name</th><th>Email</th><th>Branch</th><th>CGPA</th><th>Skills</th><th>Apps</th><th>Selected</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td class="text-muted">{{ loop.index }}</td>
+            <td class="fw-semibold">{{ s.name }}</td>
+            <td class="small">{{ s.email }}</td>
+            <td><span class="badge bg-primary">{{ s.branch }}</span></td>
+            <td class="fw-bold {% if s.cgpa >= 8.5 %}text-success{% elif s.cgpa >= 7.0 %}text-primary{% else %}text-warning{% endif %}">{{ s.cgpa }}</td>
+            <td class="small text-muted">{{ (s.skills or '')[:50] }}{% if s.skills and s.skills|length > 50 %}…{% endif %}</td>
+            <td>{{ s.total_apps }}</td>
+            <td>{% if s.selected %}<span class="badge bg-success">{{ s.selected }}</span>{% else %}—{% endif %}</td>
+            <td>
+              <form method="POST" action="{{ url_for('admin_delete_student', sid=s.id) }}" onsubmit="return confirm('Delete student {{ s.name }}?')">
+                <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

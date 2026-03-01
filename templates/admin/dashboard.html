@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — CPDS{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-2 mb-4">
+  <i class="bi bi-shield-lock text-danger fs-3"></i>
+  <h4 class="mb-0 fw-bold">Admin Dashboard — Placement Overview</h4>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-4 mb-4">
+  {% set kpis = [
+    ('Total Students', total_students, 'bi-person-badge', 'primary'),
+    ('Companies',      total_companies,'bi-building',     'success'),
+    ('Job Openings',   total_jobs,     'bi-briefcase',    'warning'),
+    ('Students Placed',total_placed,   'bi-trophy',       'danger'),
+    ('Applications',   total_apps,     'bi-file-earmark-text','info'),
+  ] %}
+  {% for label, val, icon, color in kpis %}
+  <div class="col-sm-6 col-lg">
+    <div class="card stat-card border-0 shadow-sm text-white bg-{{ color }}">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <i class="bi {{ icon }} fs-1 opacity-75"></i>
+        <div><div class="fs-2 fw-bold">{{ val }}</div><div class="small">{{ label }}</div></div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Branch-wise Chart -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white fw-bold border-0 pt-3">
+        <i class="bi bi-bar-chart me-2 text-danger"></i>Branch-wise Placement Statistics
+      </div>
+      <div class="card-body">
+        <canvas id="branchChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Pie Chart -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white fw-bold border-0 pt-3">
+        <i class="bi bi-pie-chart me-2 text-danger"></i>Application Status Breakdown
+      </div>
+      <div class="card-body">
+        <canvas id="statusChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Branch stats table -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold border-0 pt-3"><i class="bi bi-table me-2 text-danger"></i>Branch-wise Summary</div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-danger"><tr><th>Branch</th><th>Total Students</th><th>Placed</th><th>% Placed</th></tr></thead>
+          <tbody>
+            {% for b in branch_stats %}
+            <tr>
+              <td><span class="badge bg-primary">{{ b.branch }}</span></td>
+              <td>{{ b.total_students }}</td>
+              <td class="text-success fw-semibold">{{ b.placed }}</td>
+              <td>
+                {% set pct = ((b.placed / b.total_students) * 100) | round(1) if b.total_students > 0 else 0 %}
+                <div class="progress" style="height:20px">
+                  <div class="progress-bar bg-success" style="width:{{ pct }}%">{{ pct }}%</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Applications -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold border-0 pt-3 d-flex justify-content-between">
+        <span><i class="bi bi-activity me-2 text-danger"></i>Recent Activity</span>
+        <a href="{{ url_for('admin_applications') }}" class="btn btn-outline-danger btn-sm">All</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light"><tr><th>Student</th><th>Company</th><th>Role</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for app in recent_apps %}
+              <tr>
+                <td><small class="fw-semibold">{{ app.student_name }}</small></td>
+                <td><small class="text-muted">{{ app.company_name }}</small></td>
+                <td><small>{{ app.role }}</small></td>
+                <td>
+                  {% set sc = {'Selected':'success','Shortlisted':'warning','Rejected':'danger','Applied':'secondary'} %}
+                  <span class="badge bg-{{ sc[app.status] }} {% if app.status=='Shortlisted' %}text-dark{% endif %} small">{{ app.status }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const branches = {{ branch_stats | map(attribute='branch') | list | tojson }};
+const totals   = {{ branch_stats | map(attribute='total_students') | list | tojson }};
+const placed   = {{ branch_stats | map(attribute='placed') | list | tojson }};
+
+// Bar chart
+new Chart(document.getElementById('branchChart'), {
+  type: 'bar',
+  data: {
+    labels: branches,
+    datasets: [
+      { label: 'Total Students', data: totals, backgroundColor: 'rgba(13,110,253,0.7)', borderRadius: 6 },
+      { label: 'Placed',         data: placed,  backgroundColor: 'rgba(25,135,84,0.8)',  borderRadius: 6 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+});
+
+// Pie chart
+const total_placed = {{ total_placed }};
+const total_apps   = {{ total_apps }};
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Selected', 'Pending / Applied', 'Not Applied'],
+    datasets: [{
+      data: [total_placed, total_apps - total_placed, {{ total_students }} - total_apps],
+      backgroundColor: ['#198754','#ffc107','#dc3545'],
+      borderWidth: 2
+    }]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}

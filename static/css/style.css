@@ -1,0 +1,193 @@
+/* ═══════════════════════════════════════════════════
+   College Placement Database System — Custom Styles
+   ═══════════════════════════════════════════════════ */
+
+/* ── Google Fonts ─────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --cpds-primary: #0d47a1;
+  --cpds-accent:  #1565c0;
+  --cpds-gradient: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #42a5f5 100%);
+  --card-radius: 0.75rem;
+}
+
+/* ── Base ─────────────────────────────────────────── */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f0f4f8;
+  color: #1a202c;
+}
+
+/* ── Navbar ───────────────────────────────────────── */
+#mainNav {
+  background: var(--cpds-gradient);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+#mainNav .navbar-brand {
+  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+}
+
+#mainNav .nav-link {
+  color: rgba(255,255,255,0.88) !important;
+  border-radius: 6px;
+  padding: 6px 12px !important;
+  transition: background 0.2s;
+}
+
+#mainNav .nav-link:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff !important;
+}
+
+/* ── Hero ─────────────────────────────────────────── */
+.hero-section {
+  background: var(--cpds-gradient);
+  border-radius: 1rem;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+
+/* ── Auth Icon ────────────────────────────────────── */
+.auth-icon {
+  width: 70px; height: 70px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+}
+
+/* ── Feature Icon ─────────────────────────────────── */
+.feature-icon {
+  width: 72px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Step Circle ──────────────────────────────────── */
+.step-circle {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 700;
+}
+
+/* ── Profile Avatar ───────────────────────────────── */
+.profile-avatar {
+  width: 80px; height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; font-weight: 700;
+  border-radius: 50%;
+}
+
+/* ── Stat Cards ───────────────────────────────────── */
+.stat-card {
+  border-radius: var(--card-radius) !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+
+/* ── Job Cards ────────────────────────────────────── */
+.job-card {
+  border-radius: var(--card-radius) !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid transparent !important;
+}
+
+.job-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+  border-left-color: var(--cpds-accent) !important;
+}
+
+/* ── Cards generic ────────────────────────────────── */
+.card {
+  border-radius: var(--card-radius) !important;
+}
+
+.card-hover {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12) !important;
+}
+
+/* ── Form Controls ────────────────────────────────── */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 0.55rem 0.85rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--cpds-accent);
+  box-shadow: 0 0 0 3px rgba(21,101,192,0.15);
+}
+
+/* ── Buttons ──────────────────────────────────────── */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary  { background: var(--cpds-accent); border-color: var(--cpds-accent); }
+.btn-primary:hover { background: var(--cpds-primary); border-color: var(--cpds-primary); transform: translateY(-1px); }
+
+/* ── Tables ───────────────────────────────────────── */
+.table th {
+  font-weight: 600;
+  font-size: 0.83rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(13,71,161,0.04);
+}
+
+/* ── Badges ───────────────────────────────────────── */
+.badge {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* ── Alerts ───────────────────────────────────────── */
+.alert {
+  border-radius: 10px;
+  border: none;
+}
+
+/* ── Footer ───────────────────────────────────────── */
+footer {
+  background: #fff;
+  font-size: 0.85rem;
+}
+
+/* ── Print styles ─────────────────────────────────── */
+@media print {
+  #mainNav, footer, .btn, .alert { display: none !important; }
+  .card { box-shadow: none !important; border: 1px solid #dee2e6 !important; }
+}
+
+/* ── Responsive tweaks ────────────────────────────── */
+@media (max-width: 576px) {
+  .hero-section { padding: 2.5rem 1rem; }
+  .stat-card .card-body { padding: 0.75rem; }
+}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Available Jobs — CPDS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0"><i class="bi bi-briefcase me-2 text-primary"></i>Eligible Job Openings</h4>
+    <small class="text-muted">Showing jobs matching your branch ({{ student.branch }}) and CGPA ({{ student.cgpa }})</small>
+  </div>
+  <span class="badge bg-primary fs-6">{{ jobs|length }} Jobs Found</span>
+</div>
+
+{% if jobs %}
+<div class="row g-4">
+  {% for job in jobs %}
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100 job-card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h5 class="fw-bold mb-1">{{ job.role }}</h5>
+            <p class="text-muted mb-0 small"><i class="bi bi-building me-1"></i>{{ job.company_name }}</p>
+          </div>
+          <span class="badge bg-success fs-6">₹{{ job.package }} LPA</span>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 my-3">
+          <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+            <i class="bi bi-mortarboard me-1"></i>Min CGPA: {{ job.min_cgpa }}
+          </span>
+          <span class="badge bg-secondary bg-opacity-10 text-secondary border">
+            <i class="bi bi-diagram-3 me-1"></i>{{ job.eligible_branch }}
+          </span>
+          {% if job.location %}
+          <span class="badge bg-info bg-opacity-10 text-info border">
+            <i class="bi bi-geo-alt me-1"></i>{{ job.location }}
+          </span>
+          {% endif %}
+          <span class="badge bg-warning bg-opacity-10 text-warning border">
+            <i class="bi bi-calendar me-1"></i>Deadline: {{ job.deadline }}
+          </span>
+        </div>
+
+        {% if job.skills %}
+        <p class="small text-muted mb-2"><strong>Required Skills:</strong> {{ job.skills }}</p>
+        {% endif %}
+        {% if job.description %}
+        <p class="small text-muted mb-3">{{ job.description[:120] }}{% if job.description|length > 120 %}…{% endif %}</p>
+        {% endif %}
+
+        {% if job.applied %}
+        <button class="btn btn-success w-100" disabled>
+          <i class="bi bi-check-circle me-2"></i>Applied
+        </button>
+        {% else %}
+        <form method="POST" action="{{ url_for('student_apply', job_id=job.id) }}">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-send me-2"></i>Apply Now
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-inbox display-1 text-muted opacity-50 d-block mb-3"></i>
+  <h5 class="text-muted">No eligible jobs available right now</h5>
+  <p class="text-muted">Check back later or update your profile to improve eligibility.</p>
+  <a href="{{ url_for('student_profile') }}" class="btn btn-outline-primary">
+    <i class="bi bi-person-gear me-2"></i>Update Profile
+  </a>
+</div>
+{% endif %}
+{% endblock %}

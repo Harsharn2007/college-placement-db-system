@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — CPDS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-primary text-white rounded-top-4 p-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-person-circle me-2"></i>Edit Profile</h5>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" enctype="multipart/form-data">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Full Name</label>
+              <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" class="form-control bg-light" value="{{ student.email }}" disabled>
+              <small class="text-muted">Email cannot be changed</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Branch</label>
+              <select name="branch" class="form-select" required>
+                {% for br in ['CSE','IT','ECE','EEE','ME','CE','CH'] %}
+                <option value="{{ br }}" {% if student.branch==br %}selected{% endif %}>{{ br }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">CGPA (0–10)</label>
+              <input type="number" name="cgpa" class="form-control" step="0.01" min="0" max="10" value="{{ student.cgpa }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Phone</label>
+              <input type="tel" name="phone" class="form-control" value="{{ student.phone or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Upload Resume (PDF/DOC)</label>
+              <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx">
+              {% if student.resume %}
+              <small class="text-success"><i class="bi bi-check-circle me-1"></i>Current: {{ student.resume }}</small>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Skills</label>
+              <input type="text" name="skills" class="form-control" value="{{ student.skills or '' }}" placeholder="Python, React, SQL…">
+              <small class="text-muted">Comma-separated list of your technical skills</small>
+            </div>
+            <div class="col-12 mt-2">
+              <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="bi bi-save me-2"></i>Save Changes
+              </button>
+              <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

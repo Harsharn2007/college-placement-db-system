@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Company Registration — CPDS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7 col-md-9">
+    <div class="card border-0 shadow-lg rounded-4 p-4 my-4">
+      <div class="text-center mb-4">
+        <div class="auth-icon bg-success text-white rounded-circle mx-auto mb-3">
+          <i class="bi bi-building fs-2"></i>
+        </div>
+        <h3 class="fw-bold">Company Registration</h3>
+        <p class="text-muted">Register to recruit top talent</p>
+      </div>
+      <form method="POST" novalidate>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" placeholder="Acme Corp Ltd" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Official Email <span class="text-danger">*</span></label>
+            <input type="email" name="email" class="form-control" placeholder="hr@company.com" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+            <input type="password" name="password" class="form-control" placeholder="Min 6 characters" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Industry <span class="text-danger">*</span></label>
+            <input type="text" name="industry" class="form-control" placeholder="IT Services, Manufacturing…" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Website</label>
+            <input type="url" name="website" class="form-control" placeholder="https://www.company.com">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">About Company</label>
+            <textarea name="about" class="form-control" rows="3" placeholder="Brief description of your company…"></textarea>
+          </div>
+          <div class="col-12 mt-2">
+            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
+              <i class="bi bi-building-check me-2"></i>Register Company
+            </button>
+          </div>
+        </div>
+      </form>
+      <hr class="my-3">
+      <p class="text-center text-muted mb-0">Already registered? <a href="{{ url_for('company_login') }}" class="fw-semibold text-success">Login here</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
