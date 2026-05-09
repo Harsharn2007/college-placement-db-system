@@ -10,6 +10,9 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 import os
 import datetime
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # ─────────────────────────────────────────────
 #  App Configuration
@@ -17,17 +20,23 @@ import datetime
 app = Flask(__name__)
 app.secret_key = 'cpds_secret_key_2024'
 
-# MySQL Configuration – update credentials before running
-app.config['MYSQL_HOST']     = 'localhost'
-app.config['MYSQL_USER']     = 'root'
-app.config['MYSQL_PASSWORD'] = 'mysql'          # ← set your MySQL password here
-app.config['MYSQL_DB']       = 'cpds_main'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+# MySQL Configuration
+app.config['MYSQL_HOST']        = os.environ.get('MYSQL_HOST', 'localhost')
+app.config['MYSQL_USER']        = os.environ.get('MYSQL_USER', 'root')
+app.config['MYSQL_PASSWORD']    = os.environ.get('MYSQL_PASSWORD', 'mysql')
+app.config['MYSQL_DB']          = os.environ.get('MYSQL_DATABASE', 'cpds_main')
+app.config['MYSQL_PORT']        = int(os.environ.get('MYSQL_PORT', 3306))
 
 # File upload settings
-app.config['UPLOAD_FOLDER']    = os.path.join('static', 'uploads')
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024   # 5 MB
+app.config['UPLOAD_FOLDER']      = os.path.join('static', 'uploads')
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
+
+# Email Configuration
+SMTP_EMAIL    = 'sharnk027@gmail.com'
+SMTP_PASSWORD = 'zguhkniyyosiwmyf'
+SMTP_SERVER   = 'smtp.gmail.com'
+SMTP_PORT     = 587
 
 mysql = MySQL(app)
 
@@ -38,6 +47,102 @@ def inject_now():
 
 
 # ─────────────────────────────────────────────
+#  Email Functions
+# ─────────────────────────────────────────────
+def send_email(to_email, subject, body):
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From']    = SMTP_EMAIL
+        msg['To']      = to_email
+        msg.attach(MIMEText(body, 'html'))
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        server.sendmail(SMTP_EMAIL, to_email, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Email error: {e}")
+        return False
+
+
+def send_shortlist_email(student_name, student_email, company_name, job_role):
+    subject = f"Congratulations! You are Shortlisted - {job_role} at {company_name}"
+    body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+      <div style="max-width: 600px; margin: auto; background: white;
+                  border-radius: 10px; padding: 30px;
+                  border-top: 5px solid #ffc107;">
+        <h2 style="color: #ffc107;">You Have Been Shortlisted!</h2>
+        <p>Dear <strong>{student_name}</strong>,</p>
+        <p>You have been <strong>shortlisted</strong> for:</p>
+        <div style="background: #fff8e1; padding: 15px;
+                    border-radius: 8px; margin: 20px 0;">
+          <p><strong>Company:</strong> {company_name}</p>
+          <p><strong>Job Role:</strong> {job_role}</p>
+          <p><strong>Status:</strong>
+             <span style="color: #ffc107; font-weight: bold;">Shortlisted</span></p>
+        </div>
+        <p>Please log in to your placement portal to check updates.</p>
+        <a href="http://127.0.0.1:5000/student/login"
+           style="background: #ffc107; color: white; padding: 12px 25px;
+                  text-decoration: none; border-radius: 5px;
+                  display: inline-block; margin-top: 10px;">
+          View Application Status
+        </a>
+        <br><br>
+        <p style="color: #888; font-size: 12px;">
+          College Placement Database System<br>
+          This is an automated email. Please do not reply.
+        </p>
+      </div>
+    </body>
+    </html>
+    """
+    return send_email(student_email, subject, body)
+
+
+def send_selected_email(student_name, student_email, company_name, job_role, package):
+    subject = f"Congratulations! You are Selected - {job_role} at {company_name}"
+    body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+      <div style="max-width: 600px; margin: auto; background: white;
+                  border-radius: 10px; padding: 30px;
+                  border-top: 5px solid #28a745;">
+        <h2 style="color: #28a745;">Congratulations! You Are Selected!</h2>
+        <p>Dear <strong>{student_name}</strong>,</p>
+        <p>You have been <strong>selected</strong> for:</p>
+        <div style="background: #e8f5e9; padding: 15px;
+                    border-radius: 8px; margin: 20px 0;">
+          <p><strong>Company:</strong> {company_name}</p>
+          <p><strong>Job Role:</strong> {job_role}</p>
+          <p><strong>Package:</strong> {package} LPA</p>
+          <p><strong>Status:</strong>
+             <span style="color: #28a745; font-weight: bold;">Selected</span></p>
+        </div>
+        <p>The company will contact you soon with joining details.</p>
+        <a href="http://127.0.0.1:5000/student/login"
+           style="background: #28a745; color: white; padding: 12px 25px;
+                  text-decoration: none; border-radius: 5px;
+                  display: inline-block; margin-top: 10px;">
+          View Application Status
+        </a>
+        <br><br>
+        <p style="color: #888; font-size: 12px;">
+          College Placement Database System<br>
+          This is an automated email. Please do not reply.
+        </p>
+      </div>
+    </body>
+    </html>
+    """
+    return send_email(student_email, subject, body)
+
+
+# ─────────────────────────────────────────────
 #  Helpers
 # ─────────────────────────────────────────────
 def allowed_file(filename):
@@ -45,7 +150,6 @@ def allowed_file(filename):
 
 
 def login_required(role):
-    """Decorator – ensures the correct role is logged in."""
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -69,17 +173,19 @@ def index():
 #  AUTHENTICATION ROUTES
 # ══════════════════════════════════════════════
 
-# ── Student Auth ──────────────────────────────
+# Student Auth
 @app.route('/student/register', methods=['GET', 'POST'])
 def student_register():
     if request.method == 'POST':
-        name   = request.form['name'].strip()
-        email  = request.form['email'].strip()
-        password = generate_password_hash(request.form['password'])
-        branch = request.form['branch']
-        cgpa   = float(request.form['cgpa'])
-        skills = request.form['skills'].strip()
-        phone  = request.form['phone'].strip()
+        name       = request.form['name'].strip()
+        email      = request.form['email'].strip()
+        password   = generate_password_hash(request.form['password'])
+        branch     = request.form['branch']
+        cgpa       = float(request.form['cgpa'])
+        skills     = request.form['skills'].strip()
+        phone      = request.form['phone'].strip()
+        college    = request.form.get('college', '').strip()
+        department = request.form.get('department', '').strip()
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT id FROM students WHERE email=%s", (email,))
@@ -87,10 +193,11 @@ def student_register():
             flash('Email already registered.', 'danger')
             return redirect(url_for('student_register'))
 
-        cur.execute(
-            "INSERT INTO students (name,email,password,branch,cgpa,skills,phone) VALUES (%s,%s,%s,%s,%s,%s,%s)",
-            (name, email, password, branch, cgpa, skills, phone)
-        )
+        cur.execute("""
+            INSERT INTO students
+            (name, email, password, branch, cgpa, skills, phone, college, department)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (name, email, password, branch, cgpa, skills, phone, college, department))
         mysql.connection.commit()
         cur.close()
         flash('Registration successful! Please log in.', 'success')
@@ -124,7 +231,7 @@ def student_logout():
     return redirect(url_for('student_login'))
 
 
-# ── Company Auth ──────────────────────────────
+# Company Auth
 @app.route('/company/register', methods=['GET', 'POST'])
 def company_register():
     if request.method == 'POST':
@@ -178,7 +285,7 @@ def company_logout():
     return redirect(url_for('company_login'))
 
 
-# ── Admin Auth ────────────────────────────────
+# Admin Auth
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -216,22 +323,19 @@ def student_dashboard():
     cur.execute("SELECT * FROM students WHERE id=%s", (sid,))
     student = cur.fetchone()
 
-    # Stats
     cur.execute("SELECT COUNT(*) AS cnt FROM applications WHERE student_id=%s", (sid,))
     total_apps = cur.fetchone()['cnt']
     cur.execute("SELECT COUNT(*) AS cnt FROM applications WHERE student_id=%s AND status='Selected'", (sid,))
-    selected   = cur.fetchone()['cnt']
+    selected = cur.fetchone()['cnt']
     cur.execute("SELECT COUNT(*) AS cnt FROM applications WHERE student_id=%s AND status='Shortlisted'", (sid,))
     shortlisted = cur.fetchone()['cnt']
 
-    # Eligible jobs count
     cur.execute(
         "SELECT COUNT(*) AS cnt FROM jobs WHERE min_cgpa<=%s AND deadline>=CURDATE() AND (eligible_branch=%s OR eligible_branch='All')",
         (student['cgpa'], student['branch'])
     )
     eligible_jobs = cur.fetchone()['cnt']
 
-    # Recent applications
     cur.execute("""
         SELECT a.*, j.role, j.package, c.name AS company_name
         FROM applications a
@@ -255,11 +359,13 @@ def student_profile():
     cur = mysql.connection.cursor()
     sid = session['user_id']
     if request.method == 'POST':
-        name   = request.form['name'].strip()
-        branch = request.form['branch']
-        cgpa   = float(request.form['cgpa'])
-        skills = request.form['skills'].strip()
-        phone  = request.form['phone'].strip()
+        name       = request.form['name'].strip()
+        branch     = request.form['branch']
+        cgpa       = float(request.form['cgpa'])
+        skills     = request.form['skills'].strip()
+        phone      = request.form['phone'].strip()
+        college    = request.form.get('college', '').strip()
+        department = request.form.get('department', '').strip()
 
         resume_filename = None
         if 'resume' in request.files:
@@ -269,15 +375,20 @@ def student_profile():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], resume_filename))
 
         if resume_filename:
-            cur.execute(
-                "UPDATE students SET name=%s,branch=%s,cgpa=%s,skills=%s,phone=%s,resume=%s WHERE id=%s",
-                (name, branch, cgpa, skills, phone, resume_filename, sid)
-            )
+            cur.execute("""
+                UPDATE students
+                SET name=%s, branch=%s, cgpa=%s, skills=%s, phone=%s,
+                    college=%s, department=%s, resume=%s
+                WHERE id=%s
+            """, (name, branch, cgpa, skills, phone, college, department, resume_filename, sid))
         else:
-            cur.execute(
-                "UPDATE students SET name=%s,branch=%s,cgpa=%s,skills=%s,phone=%s WHERE id=%s",
-                (name, branch, cgpa, skills, phone, sid)
-            )
+            cur.execute("""
+                UPDATE students
+                SET name=%s, branch=%s, cgpa=%s, skills=%s, phone=%s,
+                    college=%s, department=%s
+                WHERE id=%s
+            """, (name, branch, cgpa, skills, phone, college, department, sid))
+
         mysql.connection.commit()
         flash('Profile updated successfully!', 'success')
 
@@ -384,15 +495,15 @@ def company_dashboard():
 @login_required('company')
 def company_post_job():
     if request.method == 'POST':
-        cid        = session['user_id']
-        role       = request.form['role'].strip()
-        package    = float(request.form['package'])
-        min_cgpa   = float(request.form['min_cgpa'])
+        cid             = session['user_id']
+        role            = request.form['role'].strip()
+        package         = float(request.form['package'])
+        min_cgpa        = float(request.form['min_cgpa'])
         eligible_branch = request.form['eligible_branch']
-        skills     = request.form['skills'].strip()
-        deadline   = request.form['deadline']
-        description = request.form.get('description', '').strip()
-        location   = request.form.get('location', '').strip()
+        skills          = request.form['skills'].strip()
+        deadline        = request.form['deadline']
+        description     = request.form.get('description', '').strip()
+        location        = request.form.get('location', '').strip()
 
         cur = mysql.connection.cursor()
         cur.execute("""
@@ -433,7 +544,8 @@ def company_applicants(job_id):
         return redirect(url_for('company_jobs'))
 
     cur.execute("""
-        SELECT a.*, s.name, s.email, s.branch, s.cgpa, s.skills, s.phone, s.resume
+        SELECT a.*, s.name, s.email, s.branch, s.cgpa, s.skills,
+               s.college, s.department, s.phone, s.resume
         FROM applications a
         JOIN students s ON a.student_id=s.id
         WHERE a.job_id=%s ORDER BY s.cgpa DESC
@@ -447,15 +559,46 @@ def company_applicants(job_id):
 @login_required('company')
 def company_update_status(app_id):
     status = request.form['status']
-    if status not in ('Applied', 'Shortlisted', 'Rejected', 'Selected'):
-        flash('Invalid status.', 'danger')
-        return redirect(request.referrer)
+    cur    = mysql.connection.cursor()
 
-    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT s.name, s.email, c.name AS company_name,
+               j.role, j.package
+        FROM applications a
+        JOIN students s  ON a.student_id = s.id
+        JOIN jobs j      ON a.job_id     = j.id
+        JOIN companies c ON j.company_id = c.id
+        WHERE a.id = %s
+    """, (app_id,))
+    details = cur.fetchone()
+
     cur.execute("UPDATE applications SET status=%s WHERE id=%s", (status, app_id))
     mysql.connection.commit()
     cur.close()
-    flash(f'Application status updated to {status}.', 'success')
+
+    if details:
+        if status == 'Shortlisted':
+            send_shortlist_email(
+                details['name'],
+                details['email'],
+                details['company_name'],
+                details['role']
+            )
+            flash(f"Status updated to Shortlisted. Email sent to {details['name']}.", 'success')
+        elif status == 'Selected':
+            send_selected_email(
+                details['name'],
+                details['email'],
+                details['company_name'],
+                details['role'],
+                details['package']
+            )
+            flash(f"Congratulations email sent to {details['name']}.", 'success')
+        else:
+            flash(f"Status updated to {status}.", 'success')
+    else:
+        flash('Status updated.', 'success')
+
     return redirect(request.referrer)
 
 
@@ -490,7 +633,6 @@ def admin_dashboard():
     cur.execute("SELECT COUNT(*) AS cnt FROM applications")
     total_apps = cur.fetchone()['cnt']
 
-    # Branch-wise stats
     cur.execute("""
         SELECT s.branch,
                COUNT(DISTINCT s.id) AS total_students,
@@ -501,7 +643,6 @@ def admin_dashboard():
     """)
     branch_stats = cur.fetchall()
 
-    # Recent applications
     cur.execute("""
         SELECT a.*, s.name AS student_name, j.role, c.name AS company_name
         FROM applications a
@@ -577,6 +718,7 @@ def admin_applications():
     if status_filter != 'all':
         cur.execute("""
             SELECT a.*, s.name AS student_name, s.branch, s.cgpa,
+                   s.college, s.department,
                    j.role, c.name AS company_name
             FROM applications a
             JOIN students s ON a.student_id=s.id
@@ -587,6 +729,7 @@ def admin_applications():
     else:
         cur.execute("""
             SELECT a.*, s.name AS student_name, s.branch, s.cgpa,
+                   s.college, s.department,
                    j.role, c.name AS company_name
             FROM applications a
             JOIN students s ON a.student_id=s.id
@@ -655,9 +798,22 @@ def admin_report():
     return render_template('admin/report.html', placed=placed, not_placed=not_placed)
 
 
+@app.route('/test-email')
+def test_email():
+    result = send_email(
+        'sharnk027@gmail.com',
+        'Test Email from CPDS',
+        '<h1>Email is working!</h1><p>Your email setup is correct.</p>'
+    )
+    if result:
+        return 'Email sent successfully! Check your inbox.'
+    else:
+        return 'Email failed. Check CMD window for error.'
+
+
 # ─────────────────────────────────────────────
 #  Run
 # ─────────────────────────────────────────────
 if __name__ == '__main__':
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(debug=True);
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)

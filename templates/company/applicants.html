@@ -24,6 +24,8 @@
             <th>#</th>
             <th>Student</th>
             <th>Branch</th>
+            <th>College</th>
+            <th>Department</th>
             <th>CGPA</th>
             <th>Skills</th>
             <th>Resume</th>
@@ -41,6 +43,8 @@
               <small class="text-muted">{{ app.phone }}</small>
             </td>
             <td><span class="badge bg-primary">{{ app.branch }}</span></td>
+            <td>{{ app.college or 'Not provided' }}</td>
+            <td>{{ app.department or 'Not provided' }}</td>
             <td>
               <span class="fw-bold {% if app.cgpa >= 8.5 %}text-success{% elif app.cgpa >= 7.0 %}text-primary{% else %}text-warning{% endif %}">
                 {{ app.cgpa }}
